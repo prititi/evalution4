@@ -9,15 +9,21 @@ userRouter.post("/register",async(req,res)=>{
     const {name, email, password ,gender,age}= (req.body)
     try{
         //for hatching the pass
-        bcrypt.hash(password, 5, async(err, hash)=> {
-            if(err) {
-                res.send({"msg":"Something went wrong","error":err.message})
-            }else {
-                let user= new userModel({name, email,password:hash,gender,age})
-                await user.save()
-                res.send({"msg":"New users has been register"})
-            }
-        });
+        let database= await userModel.find({email})
+        if(database.length>0){
+            res.send({"msg":"You are already login"})
+        }else{
+            bcrypt.hash(password, 5, async(err, hash)=> {
+                if(err) {
+                    res.send({"msg":"Something went wrong","error":err.message})
+                }else {
+                    let user= new userModel({name, email,password:hash,gender,age})
+                    await user.save()
+                    res.send({"msg":"New users has been register"})
+                }
+            });
+        }
+        
        
     }catch(err){
         res.send({"msg":"Something went wrong","error":err.message})
